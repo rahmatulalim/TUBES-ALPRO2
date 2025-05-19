@@ -2,14 +2,11 @@ package main
 
 import "fmt"
 
-const NMAX = 5
+const NMAX = 100000
 
 type proyek struct {
-	nama string
-	teknologi string
-	kategori string
-	kesulitan int
-	tanggal int
+	nama, teknologi, kategori string
+	kesulitan, tanggal int
 }
 
 type daftarProyek struct {
@@ -21,10 +18,10 @@ func tambahProyek(dp *daftarProyek, p proyek) {
 	if dp.tersimpan < NMAX {
 		dp.data[dp.tersimpan] = p
 		dp.tersimpan++
+		fmt.Println("Proyek berhasil ditambahkan!")
 	} else {
 		fmt.Println("Kapasitas proyek sudah penuh!")
 	}
-	fmt.Println("Proyek berhasil ditambahkan!")
 }
 
 func tampilkanSemua(dp daftarProyek) {
@@ -117,7 +114,7 @@ func ubahProyek(dp *daftarProyek, nama string) {
 		fmt.Print("Tanggal Pembuatan (1-31): ")
 		fmt.Scan(&p.tanggal)
 		dp.data[index] = p
-		fmt.Println("Proyek berhasil diubah.")
+		fmt.Println("Proyek berhasil diubah")
 	}
 }
 
@@ -182,22 +179,22 @@ func main() {
 			index = cariProyek(daftar, cariNama)
 			if index != -1 {
 				fmt.Println("Proyek ditemukan:")
-				fmt.Println("Nama      :", daftar.data[index].nama)
+				fmt.Println("Nama :", daftar.data[index].nama)
 				fmt.Println("Teknologi :", daftar.data[index].teknologi)
-				fmt.Println("Kategori  :", daftar.data[index].kategori)
+				fmt.Println("Kategori :", daftar.data[index].kategori)
 				fmt.Println("Kesulitan :", daftar.data[index].kesulitan)
-				fmt.Println("Tanggal   :", daftar.data[index].tanggal)
+				fmt.Println("Tanggal :", daftar.data[index].tanggal)
 			} else {
-				fmt.Println("Proyek tidak ditemukan.")
+				fmt.Println("Proyek tidak ditemukan")
 			}
 
 		} else if pilihan == 4 {
 			urutkanKesulitan(&daftar, nData)
-			fmt.Println("Proyek berhasil diurutkan berdasarkan kesulitan.")
+			fmt.Println("Proyek berhasil diurutkan berdasarkan kesulitan")
 
 		} else if pilihan == 5 {
 			urutkanTanggal(&daftar, nData)
-			fmt.Println("Proyek berhasil diurutkan berdasarkan tanggal.")
+			fmt.Println("Proyek berhasil diurutkan berdasarkan tanggal")
 
 		} else if pilihan == 6 {
 			jumProyekKatagori(daftar)
@@ -214,7 +211,7 @@ func main() {
 
 		} else {
 			if pilihan == 9 {
-				fmt.Println("Terima kasih telah menggunakan aplikasi.")
+				fmt.Println("Terima kasih telah menggunakan aplikasi")
 			} else {
 				if pilihan != 1 || pilihan != 2 || pilihan != 3 || pilihan != 4 || pilihan != 5 || pilihan != 6 || pilihan != 7 || pilihan != 8 || pilihan != 9 {
 					fmt.Println("Pilihan tidak valid")
