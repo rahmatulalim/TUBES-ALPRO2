@@ -24,7 +24,7 @@ func tambahProyek(dp *daftarProyek, p proyek) {
 	}
 }
 
-func tampilkanSemua(dp daftarProyek) {
+func tampilkanSemuaProyek(dp daftarProyek) {
 	var i int
 	if dp.tersimpan == 0 {
 		fmt.Println("Belum ada data proyek.")
@@ -50,7 +50,7 @@ func cariProyek(dp daftarProyek, nama string) int {
 	return -1
 }
 
-func urutkanKesulitan(dp *daftarProyek, n int) {
+func urutKesulitan(dp *daftarProyek, n int) {
 	var i, idx, pass int
 	var temp proyek
 
@@ -73,7 +73,7 @@ func urutkanKesulitan(dp *daftarProyek, n int) {
 }
 
 
-func urutkanTanggal(dp *daftarProyek, n int) {
+func urutTanggal(dp *daftarProyek, n int) {
 	var i, pass int
 	var temp proyek
 
@@ -147,7 +147,6 @@ func main() {
 		fmt.Println("|========================================|")
 		fmt.Print("Pilih menu: ")
 		fmt.Scan(&pilihan)
-
 		if pilihan == 1 {
 			fmt.Print("Nama Proyek: ")
 			fmt.Scan(&p.nama)
@@ -172,7 +171,6 @@ func main() {
 			}
 		} else if pilihan == 2 {
 			tampilkanSemua(daftar)
-
 		} else if pilihan == 3 {
 			fmt.Print("Masukkan Nama Proyek: ")
 			fmt.Scan(&cariNama)
@@ -187,28 +185,22 @@ func main() {
 			} else {
 				fmt.Println("Proyek tidak ditemukan")
 			}
-
 		} else if pilihan == 4 {
 			urutkanKesulitan(&daftar, nData)
 			fmt.Println("Proyek berhasil diurutkan berdasarkan kesulitan")
-
 		} else if pilihan == 5 {
 			urutkanTanggal(&daftar, nData)
 			fmt.Println("Proyek berhasil diurutkan berdasarkan tanggal")
-
 		} else if pilihan == 6 {
 			jumProyekKatagori(daftar)
-
 		} else if pilihan == 7 {
 			fmt.Print("Masukkan nama proyek yang ingin diubah: ")
 			fmt.Scan(&cariNama)
 			ubahProyek(&daftar, cariNama)
-
 		} else if pilihan == 8 {
 			fmt.Print("Masukkan nama proyek yang ingin dihapus: ")
 			fmt.Scan(&cariNama)
 			hapusProyek(&daftar, cariNama)
-
 		} else {
 			if pilihan == 9 {
 				fmt.Println("Terima kasih telah menggunakan aplikasi")
