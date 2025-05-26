@@ -1,136 +1,309 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-const NMAX = 100000
+const NMAX int = 100000
 
 type proyek struct {
 	nama, teknologi, kategori string
 	kesulitan, tanggal int
 }
 
-type daftarProyek struct {
-	data [NMAX]proyek
-	tersimpan int
-}
+type tabInt [NMAX]proyek
 
-func tambahProyek(dp *daftarProyek, p proyek) {
-	if dp.tersimpan < NMAX {
-		dp.data[dp.tersimpan] = p
-		dp.tersimpan++
-		fmt.Println("Proyek berhasil ditambahkan!")
-	} else {
-		fmt.Println("Kapasitas proyek sudah penuh!")
+func tambahProyek(A *tabInt, n *int, p proyek) {
+	if *n < NMAX {	
+		A[*n] = p
+		*n = *n + 1
+		fmt.Println("Proyek berhasil ditambahkan")
 	}
 }
 
-func tampilkanSemuaProyek(dp daftarProyek) {
+func tampilkanProyek(A tabInt, n int) {
 	var i int
-	if dp.tersimpan == 0 {
-		fmt.Println("Belum ada data proyek.")
+	if n == 0 {
+		fmt.Println("Belum ada proyek")
 	} else {
-		for i = 0; i < dp.tersimpan; i++ {
+		for i = 0; i < n; i++ {
 			fmt.Printf("|=========== Proyek ke-%d ==========|\n", i+1)
-			fmt.Printf("|%-10s : %-20s |\n","Nama", dp.data[i].nama)
-			fmt.Printf("|%-10s : %-20s |\n","Teknologi", dp.data[i].teknologi)
-			fmt.Printf("|%-10s : %-20s |\n","Kategori", dp.data[i].kategori)
-			fmt.Printf("|%-10s : %-20d |\n","Kesulitan", dp.data[i].kesulitan)
-			fmt.Printf("|%-10s : %-20d |\n","Tanggal", dp.data[i].tanggal)
+			fmt.Printf("|%-10s : %-20s |\n", "Nama", A[i].nama)
+			fmt.Printf("|%-10s : %-20s |\n", "Teknologi", A[i].teknologi)
+			fmt.Printf("|%-10s : %-20s |\n", "Kategori", A[i].kategori)
+			fmt.Printf("|%-10s : %-20d |\n", "Kesulitan", A[i].kesulitan)
+			fmt.Printf("|%-10s : %-20d |\n", "Tanggal", A[i].tanggal)
 		}
 	}
 }
 
-func cariProyek(dp daftarProyek, nama string) int {
+func sequentialSearchNama(A *tabInt, n int, nama string) int {
 	var i int
-	for i = 0; i < dp.tersimpan; i++ {
-		if dp.data[i].nama == nama {
-			return i
+	for i = 0; i < n; i++ {
+		if helper(A[i].nama) == nama {
+			return i 
 		}
 	}
 	return -1
 }
 
-func urutKesulitan(dp *daftarProyek, n int) {
+func urutkanKategori(A *tabInt, n int) {
 	var i, idx, pass int
 	var temp proyek
-
-	n = dp.tersimpan
+	
 	pass = 1
 	for pass < n {
 		idx = pass - 1
 		i = pass
 		for i < n {
-			if dp.data[i].kesulitan < dp.data[idx].kesulitan {
+			if helper(A[i].kategori) < helper(A[idx].kategori) {
 				idx = i
 			}
 			i++
 		}
-		temp = dp.data[pass-1]
-		dp.data[pass-1] = dp.data[idx]
-		dp.data[idx] = temp
+		temp = A[pass-1]
+		A[pass-1] = A[idx]
+		A[idx] = temp
 		pass++
 	}
 }
 
+func binarySearchKategori(A tabInt, n int, kategori string) int {
+	var left, right, middle int
+	left = 0
+	right = n - 1
+	
+	kategori = helper(kategori)
+	for left <= right {
+		middle = (left + right) / 2
+		if helper(A[middle].kategori) == kategori {
+			return middle
+		} else if helper(A[middle].kategori) < kategori {
+			left = middle + 1
+		} else {
+			right = middle - 1
+		}
+	}
+	return -1
+}
 
-func urutTanggal(dp *daftarProyek, n int) {
+func urutkanKesulitan(A *tabInt, n int) {
+	var i, idx, pass int
+	var temp proyek
+
+	pass = 1
+	for pass < n {
+		idx = pass - 1
+		i = pass
+		for i < n {
+			if A[i].kesulitan < A[idx].kesulitan {
+				idx = i
+			}
+			i++
+		}
+		temp = A[pass-1]
+		A[pass-1] = A[idx]
+		A[idx] = temp
+		pass++
+	}
+}
+
+func urutkanTanggal(A *tabInt, n int) {
 	var i, pass int
 	var temp proyek
 
-	n = dp.tersimpan
 	pass = 1
-	for pass <= n - 1 {
+	for pass <= n-1 {
 		i = pass
-		temp = dp.data[pass]
-		for i > 0 && temp.tanggal < dp.data[i-1].tanggal {
-			dp.data[i] = dp.data[i-1]
+		temp = A[pass]
+		for i > 0 && temp.tanggal < A[i-1].tanggal {
+			A[i] = A[i-1]
 			i--
 		}
-		dp.data[i] = temp
+		A[i] = temp
 		pass++
 	}
 }
 
-func jumProyekKatagori(dp daftarProyek) {
-	
+func jumKategoriProyek(A *tabInt, n int) {
+	var ml, dv, dc, nlp, eda int
+	var i int
+	for i = 0; i < n; i++ {
+		switch (A[i].kategori) {
+		case "Machine-Learning":
+			ml++
+		case "Data-Visualization":
+			dv++
+		case "Data-Cleaning":
+			dc++
+		case "NLP":
+			nlp++
+		case "EDA":
+			eda++
+		}
+	}
+	fmt.Println("Jumlah statistik proyek per kategori: ")
+	fmt.Println("Machine Learning:", ml)
+	fmt.Println("Data Visualization:", dv)
+	fmt.Println("Data Cleaning:", dc)
+	fmt.Println("NLP:", nlp)
+	fmt.Println("EDA:", eda)
 }
 
-func ubahProyek(dp *daftarProyek, nama string) {
+func ubahProyek(A *tabInt, n int, nama string) {
 	var index int
 	var p proyek
-	index = cariProyek(*dp, nama)
+	index = sequentialSearchNama(A, n, helper(nama))
 	if index == -1 {
-		fmt.Println("Proyek tidak ditemukan.")
+		fmt.Println("Proyek tidak ditemukan")
 	} else {
 		fmt.Println("Masukkan data baru untuk proyek:")
 		fmt.Print("Nama Proyek: ")
 		fmt.Scan(&p.nama)
-		fmt.Print("Teknologi Digunakan: ")
-		fmt.Scan(&p.teknologi)
-		fmt.Print("Kategori Proyek: ")
-		fmt.Scan(&p.kategori)
+		p.teknologi = pilihTeknologi()
+		p.kategori = pilihKategori()
 		fmt.Print("Tingkat Kesulitan (1-10): ")
 		fmt.Scan(&p.kesulitan)
 		fmt.Print("Tanggal Pembuatan (1-31): ")
 		fmt.Scan(&p.tanggal)
-		dp.data[index] = p
+		A[index] = p
 		fmt.Println("Proyek berhasil diubah")
 	}
 }
 
-func hapusProyek(dp *daftarProyek, nama string) {
+func hapusProyek(A *tabInt, n *int, nama string) {
+	var index int
+	var i int
+	index = sequentialSearchNama(A, *n, helper(nama))
+	if index == -1 {
+		fmt.Println("Proyek tidak ditemukan")
+	} else {
+		for i = index; i < *n-1; i++ {
+			A[i] = A[i+1]
+		}
+		*n = *n - 1
+		fmt.Println("Proyek berhasil dihapus")
+	}
+}
+
+
+func daftarKeahlian(A tabInt, n int) {
+	var keahlian [NMAX]string
+	var jumlahKeahlian, i, j int
+	var status bool
+
+	jumlahKeahlian = 0
+	for i = 0; i < n; i++ {
+		status = false
+		for j = 0; j < jumlahKeahlian; j++ {
+			if A[i].teknologi == keahlian[j] {
+				status = true
+			}
+		}
+		if !status {
+			keahlian[jumlahKeahlian] = A[i].teknologi
+			jumlahKeahlian++
+		}
+	}
+	for i = 0; i < jumlahKeahlian; i++ {
+		fmt.Println("-", keahlian[i])
+	}
+	if jumlahKeahlian == 0{
+		fmt.Println("Belum ada proyek yang ditambahkan")
+	}
+}
+
+func pilihTeknologi() string {
+	var pilih int
+	var status bool
+	var teknologi string
 	
+	status = false
+	for !status {
+		fmt.Println("Pilih Teknologi: ")
+		fmt.Println("1. Python")
+		fmt.Println("2. Pandas")
+		fmt.Println("3. Matplotlib")
+		fmt.Println("4. Scikit-learn")
+		fmt.Println("5. NLTK")
+		fmt.Print("Masukkan pilihan (1-5): ")
+		fmt.Scan(&pilih)
+	
+		if pilih == 1 {
+			teknologi = "Python"
+			status = true
+		} else if pilih == 2 {
+			teknologi = "Pandas"
+			status = true
+		} else if pilih == 3 {
+			teknologi = "Matplotlib"
+			status = true
+		} else if pilih == 4 {
+			teknologi = "Scikit-learn"
+			status = true
+		} else if pilih == 5 {
+			teknologi = "NLTK"
+			status = true
+		} else {
+			fmt.Println("Pilihan tidak valid, mohon masukkan pilihan yang ada!")
+		}
+	}
+	return teknologi
+}
+
+func pilihKategori() string {
+	var pilih int
+	var status bool
+	var kategori string
+
+	status = false
+	for !status {
+		fmt.Println("Pilih Kategori: ")
+		fmt.Println("1. Machine Learning")
+		fmt.Println("2. Data Visualization")
+		fmt.Println("3. Data Cleaning")
+		fmt.Println("4. NLP")
+		fmt.Println("5. EDA")
+		fmt.Print("Masukkan pilihan (1-5): ")
+		fmt.Scan(&pilih)
+
+		if pilih == 1 {
+			kategori = "Machine-Learning"
+			status = true
+		} else if pilih == 2 {
+			kategori = "Data-Visualization"
+			status = true
+		} else if pilih == 3 {
+			kategori = "Data-Cleaning"
+			status = true
+		} else if pilih == 4 {
+			kategori = "NLP"
+			status = true
+		} else if pilih == 5 {
+			kategori = "EDA"
+			status = true
+		} else {
+			fmt.Println("Pilihan tidak valid, mohon masukkan pilihan yang ada!")
+		}
+	}
+	return kategori
+}
+
+func helper(teks string) string {
+	return strings.ToLower(strings.TrimSpace(teks))
 }
 
 func main() {
-	var daftar daftarProyek
-	var pilihan, index, nData int
+	var data tabInt
+	var nData int
+	var pilih, index int
 	var p proyek
 	var cariNama string
-	var selesai bool
+	var status bool
 
-	selesai = false
-	for !selesai {
+	status = false
+	for !status {
 		fmt.Println()
 		fmt.Println("|=========||| SELAMAT DATANG |||=========|")
 		fmt.Println("|                                        |")
@@ -138,78 +311,97 @@ func main() {
 		fmt.Println("|1. Tambah Proyek                        |")
 		fmt.Println("|2. Tampilkan Semua Proyek               |")
 		fmt.Println("|3. Cari Proyek berdasarkan Nama         |")
-		fmt.Println("|4. Urutkan berdasarkan Kesulitan        |")
-		fmt.Println("|5. Urutkan berdasarkan Tanggal          |")
-		fmt.Println("|6. Tampilkan Statistik Kategori         |")
-		fmt.Println("|7. Ubah Proyek                          |")
-		fmt.Println("|8. Hapus Proyek                         |")
-		fmt.Println("|9. Keluar                               |")
+		fmt.Println("|4. Cari Proyek berdasarkan Kategori     |")
+		fmt.Println("|5. Urutkan berdasarkan Kesulitan        |")
+		fmt.Println("|6. Urutkan berdasarkan Tanggal          |")
+		fmt.Println("|7. Tampilkan Statistik Kategori         |")
+		fmt.Println("|8. Ubah Proyek                          |")
+		fmt.Println("|9. Hapus Proyek                         |")
+		fmt.Println("|10. Daftar Keahlian                     |")
+		fmt.Println("|11. Keluar                              |")
 		fmt.Println("|========================================|")
 		fmt.Print("Pilih menu: ")
-		fmt.Scan(&pilihan)
-		if pilihan == 1 {
+		fmt.Scan(&pilih)
+		if pilih == 1 {
 			fmt.Print("Nama Proyek: ")
 			fmt.Scan(&p.nama)
-			fmt.Print("Teknologi Digunakan: ")
-			fmt.Scan(&p.teknologi)
-			fmt.Print("Kategori Proyek: ")
-			fmt.Scan(&p.kategori)
+			p.teknologi = pilihTeknologi()
+			fmt.Println()
+			p.kategori = pilihKategori()
 			fmt.Print("Tingkat Kesulitan (1-10): ")
 			fmt.Scan(&p.kesulitan)
 			if p.kesulitan < 1 || p.kesulitan > 10 {
-				fmt.Println("Input tidak valid, kesulitan harus 1-10!")
-				selesai = true
+				fmt.Println("Input tidak valid, Kesulitan harus 1-10!")
 			} else {
 				fmt.Print("Tanggal Pembuatan (1-31): ")
 				fmt.Scan(&p.tanggal)
 				if p.tanggal < 1 || p.tanggal > 31 {
-					fmt.Println("Input tidak valid, tanggal harus 1-31")
-					selesai = true
+					fmt.Println("Input tidak valid, Tanggal harus 1-31!")
 				} else {
-					tambahProyek(&daftar, p)
+					tambahProyek(&data, &nData, p)
 				}
 			}
-		} else if pilihan == 2 {
-			tampilkanSemua(daftar)
-		} else if pilihan == 3 {
-			fmt.Print("Masukkan Nama Proyek: ")
+		} else if pilih == 2 {
+			tampilkanProyek(data, nData)
+		} else if pilih == 3 {
+			fmt.Print("Masukkan nama proyek yang ingin dicari: ")
 			fmt.Scan(&cariNama)
-			index = cariProyek(daftar, cariNama)
+			cariNama = helper(cariNama)
+			index = sequentialSearchNama(&data, nData, cariNama)
 			if index != -1 {
 				fmt.Println("Proyek ditemukan:")
-				fmt.Println("Nama :", daftar.data[index].nama)
-				fmt.Println("Teknologi :", daftar.data[index].teknologi)
-				fmt.Println("Kategori :", daftar.data[index].kategori)
-				fmt.Println("Kesulitan :", daftar.data[index].kesulitan)
-				fmt.Println("Tanggal :", daftar.data[index].tanggal)
+				fmt.Println("Nama :", data[index].nama)
+				fmt.Println("Teknologi :", data[index].teknologi)
+				fmt.Println("Kategori :", data[index].kategori)
+				fmt.Println("Kesulitan :", data[index].kesulitan)
+				fmt.Println("Tangga1l :", data[index].tanggal)
 			} else {
-				fmt.Println("Proyek tidak ditemukan")
+				fmt.Println("Proyek dengan nama tersebut tidak ditemukan")
 			}
-		} else if pilihan == 4 {
-			urutkanKesulitan(&daftar, nData)
-			fmt.Println("Proyek berhasil diurutkan berdasarkan kesulitan")
-		} else if pilihan == 5 {
-			urutkanTanggal(&daftar, nData)
+		} else if pilih == 4 {
+			urutkanKategori(&data, nData)
+			fmt.Print("Masukkan kategori proyek yang ingin dicari: ")
+			fmt.Scan(&cariNama)
+			cariNama = helper(cariNama)
+			index = binarySearchKategori(data, nData, cariNama)
+			if index != -1 {
+				fmt.Println("Proyek ditemukan:")
+				fmt.Println("Nama :", data[index].nama)
+				fmt.Println("Teknologi :", data[index].teknologi)
+				fmt.Println("Kategori :", data[index].kategori)
+				fmt.Println("Kesulitan :", data[index].kesulitan)
+				fmt.Println("Tanggal :", data[index].tanggal)
+			} else {
+				fmt.Println("Proyek dengan kategori tersebut tidak ditemukan")
+			}
+		} else if pilih == 5 {
+			urutkanKesulitan(&data, nData)
+			fmt.Println("Proyek berhasil diurutkan berdasarkan tingkat kesulitan")
+		} else if pilih == 6 {
+			urutkanTanggal(&data, nData)
 			fmt.Println("Proyek berhasil diurutkan berdasarkan tanggal")
-		} else if pilihan == 6 {
-			jumProyekKatagori(daftar)
-		} else if pilihan == 7 {
+		} else if pilih == 7 {
+			jumKategoriProyek(&data, nData)
+		} else if pilih == 8 {
 			fmt.Print("Masukkan nama proyek yang ingin diubah: ")
 			fmt.Scan(&cariNama)
-			ubahProyek(&daftar, cariNama)
-		} else if pilihan == 8 {
+			ubahProyek(&data, nData, cariNama)
+		} else if pilih == 9 {
 			fmt.Print("Masukkan nama proyek yang ingin dihapus: ")
 			fmt.Scan(&cariNama)
-			hapusProyek(&daftar, cariNama)
+			hapusProyek(&data, &nData, cariNama)
+		} else if pilih == 10 {
+			fmt.Println("Daftar keahlian yang digunakan dalam proyek: ")
+			daftarKeahlian(data, nData)
 		} else {
-			if pilihan == 9 {
-				fmt.Println("Terima kasih telah menggunakan aplikasi")
+			if pilih == 11 {
+				fmt.Println("Terima kasih sudah menggunakan aplikasi")
 			} else {
-				if pilihan != 1 || pilihan != 2 || pilihan != 3 || pilihan != 4 || pilihan != 5 || pilihan != 6 || pilihan != 7 || pilihan != 8 || pilihan != 9 {
-					fmt.Println("Pilihan tidak valid")
+				if pilih != 1 || pilih != 2 || pilih != 3 || pilih != 4 || pilih != 5 || pilih != 6 || pilih != 7 || pilih != 8 || pilih != 9 || pilih != 10 || pilih != 11 {
+					fmt.Println("Pilihan anda tidak valid, mohon memilih 1-11")
 				}
 			}
-			selesai = true
+			status = true
 		}
 	}
 }
