@@ -1,9 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
 const NMAX int = 100000
 
@@ -41,7 +38,7 @@ func tampilkanProyek(A tabInt, n int) {
 func sequentialSearchNama(A *tabInt, n int, nama string) int {
 	var i int
 	for i = 0; i < n; i++ {
-		if helper(A[i].nama) == nama {
+		if (A[i].nama) == nama {
 			return i 
 		}
 	}
@@ -57,7 +54,7 @@ func urutkanKategori(A *tabInt, n int) {
 		idx = pass - 1
 		i = pass
 		for i < n {
-			if helper(A[i].kategori) < helper(A[idx].kategori) {
+			if (A[i].kategori) < (A[idx].kategori) {
 				idx = i
 			}
 			i++
@@ -69,23 +66,40 @@ func urutkanKategori(A *tabInt, n int) {
 	}
 }
 
-func binarySearchKategori(A tabInt, n int, kategori string) int {
+func binarySearchKategori(A tabInt, n int, kategori string) {
 	var left, right, middle int
+	var i, idx int
 	left = 0
 	right = n - 1
+	idx = -1
 	
-	kategori = helper(kategori)
-	for left <= right {
+	for left <= right && idx == -1 {
 		middle = (left + right) / 2
-		if helper(A[middle].kategori) == kategori {
-			return middle
-		} else if helper(A[middle].kategori) < kategori {
+		if kategori < A[middle].kategori {
+			right = middle - 1
+		} else if kategori > A[middle].kategori {
 			left = middle + 1
 		} else {
-			right = middle - 1
+			idx = middle
 		}
 	}
-	return -1
+	if idx == -1 {
+		fmt.Println("Proyek dengan kategori tersebut tidak ditemukan")
+	} else {
+		for idx > 0 && A[idx-1].kategori == kategori {
+			idx--
+		}
+		i = idx
+		for i < n && A[i].kategori == kategori {
+			fmt.Printf("|=========== Proyek ke-%d ==========|\n", i+1)
+			fmt.Printf("|%-10s : %-20s |\n", "Nama", A[i].nama)
+			fmt.Printf("|%-10s : %-20s |\n", "Teknologi", A[i].teknologi)
+			fmt.Printf("|%-10s : %-20s |\n", "Kategori", A[i].kategori)
+			fmt.Printf("|%-10s : %-20d |\n", "Kesulitan", A[i].kesulitan)
+			fmt.Printf("|%-10s : %-20d |\n", "Tanggal", A[i].tanggal)
+			i++
+		}
+	}
 }
 
 func urutkanKesulitan(A *tabInt, n int) {
@@ -154,7 +168,7 @@ func jumKategoriProyek(A *tabInt, n int) {
 func ubahProyek(A *tabInt, n int, nama string) {
 	var index int
 	var p proyek
-	index = sequentialSearchNama(A, n, helper(nama))
+	index = sequentialSearchNama(A, n, nama)
 	if index == -1 {
 		fmt.Println("Proyek tidak ditemukan")
 	} else {
@@ -175,7 +189,7 @@ func ubahProyek(A *tabInt, n int, nama string) {
 func hapusProyek(A *tabInt, n *int, nama string) {
 	var index int
 	var i int
-	index = sequentialSearchNama(A, *n, helper(nama))
+	index = sequentialSearchNama(A, *n, nama)
 	if index == -1 {
 		fmt.Println("Proyek tidak ditemukan")
 	} else {
@@ -290,10 +304,6 @@ func pilihKategori() string {
 	return kategori
 }
 
-func helper(teks string) string {
-	return strings.ToLower(strings.TrimSpace(teks))
-}
-
 func main() {
 	var data tabInt
 	var nData int
@@ -323,6 +333,8 @@ func main() {
 		fmt.Print("Pilih menu: ")
 		fmt.Scan(&pilih)
 		if pilih == 1 {
+			fmt.Println("Mohon untuk menambahkan proyek disarankan memberi nama yang berbeda agar tidak terjadi duplikasi:)")
+			fmt.Println()
 			fmt.Print("Nama Proyek: ")
 			fmt.Scan(&p.nama)
 			p.teknologi = pilihTeknologi()
@@ -346,7 +358,6 @@ func main() {
 		} else if pilih == 3 {
 			fmt.Print("Masukkan nama proyek yang ingin dicari: ")
 			fmt.Scan(&cariNama)
-			cariNama = helper(cariNama)
 			index = sequentialSearchNama(&data, nData, cariNama)
 			if index != -1 {
 				fmt.Println("Proyek ditemukan:")
@@ -362,18 +373,7 @@ func main() {
 			urutkanKategori(&data, nData)
 			fmt.Print("Masukkan kategori proyek yang ingin dicari: ")
 			fmt.Scan(&cariNama)
-			cariNama = helper(cariNama)
-			index = binarySearchKategori(data, nData, cariNama)
-			if index != -1 {
-				fmt.Println("Proyek ditemukan:")
-				fmt.Println("Nama :", data[index].nama)
-				fmt.Println("Teknologi :", data[index].teknologi)
-				fmt.Println("Kategori :", data[index].kategori)
-				fmt.Println("Kesulitan :", data[index].kesulitan)
-				fmt.Println("Tanggal :", data[index].tanggal)
-			} else {
-				fmt.Println("Proyek dengan kategori tersebut tidak ditemukan")
-			}
+			binarySearchKategori(data, nData, cariNama)
 		} else if pilih == 5 {
 			urutkanKesulitan(&data, nData)
 			fmt.Println("Proyek berhasil diurutkan berdasarkan tingkat kesulitan")
