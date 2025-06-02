@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-const NMAX int = 100000
+const NMAX int = 1000
 
 type proyek struct {
 	nama, teknologi, kategori string
@@ -365,7 +365,7 @@ func main() {
 				fmt.Println("Teknologi :", data[index].teknologi)
 				fmt.Println("Kategori :", data[index].kategori)
 				fmt.Println("Kesulitan :", data[index].kesulitan)
-				fmt.Println("Tangga1l :", data[index].tanggal)
+				fmt.Println("Tanggal :", data[index].tanggal)
 			} else {
 				fmt.Println("Proyek dengan nama tersebut tidak ditemukan")
 			}
